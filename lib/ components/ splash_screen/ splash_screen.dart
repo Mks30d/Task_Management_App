@@ -4,19 +4,41 @@ import 'package:tmaa/%20components/auth/signup.dart';
 import 'package:tmaa/%20components/home/home_ui/home_page.dart';
 import 'package:tmaa/main.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Add a 2-second delay before navigating
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      Navigator.pushReplacement(context, MaterialPageRoute(
+        builder: (context) {
+          return StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot.data != null) {
+                  return HomePage();
+                }
+                return Signup();
+              });
+        },
+      ));
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   body: Container(
-    //     color: offWhite,
-    //     child: Center(
-    //       child: Image.asset("assets/img/tick.png"),
-    //     ),
-    //   ),
-    // );
     return Scaffold(
         backgroundColor: offWhite,
         body: Stack(
@@ -27,9 +49,9 @@ class SplashScreen extends StatelessWidget {
                 children: [
                   Center(
                       child: Image.asset(
-                    "assets/img/tick.png",
-                    height: 200,
-                  )),
+                        "assets/img/tick.png",
+                        height: 200,
+                      )),
                   SizedBox(
                     height: 22,
                   ),

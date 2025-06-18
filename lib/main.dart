@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tmaa/%20components/home/home_ui/home_page.dart';
-import 'package:tmaa/%20splash_screen.dart';
+import 'package:tmaa/%20components/%20splash_screen/%20splash_screen.dart';
 
 import 'firebase_options.dart';
 
