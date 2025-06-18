@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../main.dart';
 import 'add_task.dart';
@@ -56,6 +57,30 @@ class _AllTasksPageState extends State<AllTasksPage> {
 
           List<QueryDocumentSnapshot> tasks = snapshot.data!.docs;
 
+// Separate completed and incomplete tasks
+          List<QueryDocumentSnapshot> incompleteTasks = [];
+          List<QueryDocumentSnapshot> completedTasks = [];
+
+          for (var task in tasks) {
+            if ((task['isCompleted'] ?? false) == true) {
+              completedTasks.add(task);
+            } else {
+              incompleteTasks.add(task);
+            }
+          }
+
+// Sort incomplete tasks if sorting is enabled
+          if (sortByPriority) {
+            incompleteTasks.sort((a, b) {
+              final aPriority = _priorityValue(a['priority']);
+              final bPriority = _priorityValue(b['priority']);
+              return bPriority.compareTo(aPriority); // high to low
+            });
+          }
+
+// Merge lists: incomplete first, completed last
+          tasks = [...incompleteTasks, ...completedTasks];
+
           if (sortByPriority) {
             tasks.sort((a, b) {
               final aPriority = _priorityValue(a['priority']);
@@ -101,17 +126,36 @@ class _AllTasksPageState extends State<AllTasksPage> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(description),
-                      Text("Due: ${dueDate.toLocal()}"),
-                      Text("Priority: ${priority.toUpperCase()}"),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          decoration:
+                              isCompleted ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                      Text(
+                        "Due: ${DateFormat('yyyy-MM-dd').format(dueDate)}",
+                        style: TextStyle(
+                          decoration:
+                              isCompleted ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                      Text(
+                        "Priority: ${priority.toUpperCase()}",
+                        style: TextStyle(
+                          decoration:
+                              isCompleted ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
                     ],
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.edit,
+                          color: primaryColor,
                         ),
                         onPressed: () {
                           showEditTaskDialog(
@@ -119,8 +163,9 @@ class _AllTasksPageState extends State<AllTasksPage> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.delete,
+                          color: primaryColor,
                         ),
                         onPressed: () {
                           showDialog(

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tmaa/%20components/auth/signin.dart';
 import 'package:tmaa/%20components/tasks/add_task.dart';
 import 'package:tmaa/%20components/tasks/all_tasks.dart';
@@ -14,11 +15,10 @@ class _HomePageState extends State<HomePage> {
   final auth = FirebaseAuth.instance;
   int _selectedIndex = 0;
 
-  // Dummy pages for demonstration
+  // Pages
   final List<Widget> _pages = [
     AllTasksPage(),
-    // Center(child: Text("0 Page")),
-    Center(child: Text("0 Page")),
+    Center(child: Text("Add")),
     Center(child: Text("Calendar Page")),
   ];
 
@@ -28,12 +28,62 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // Get today's day and date
+  String getFormattedDate() {
+    final now = DateTime.now();
+    return DateFormat('EEEE, MMMM d').format(now); // e.g. Tuesday, June 18
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = auth.currentUser;
+
     return Scaffold(
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            children: [
+              UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: primaryColor),
+                accountName: Text("Logged In"),
+                accountEmail: Text(currentUser?.email ?? "No email"),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, color: primaryColor),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text("Sign Out"),
+                onTap: () async {
+                  await auth.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Signin()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
-        title: Text("Task Management App"),
         backgroundColor: primaryColor,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Text("Task Management App", style: TextStyle(fontSize: 18)),
+            Text(getFormattedDate(), style: TextStyle(fontSize: 18)),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // Non-functional
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         child: Row(
@@ -59,7 +109,6 @@ class _HomePageState extends State<HomePage> {
               child: GestureDetector(
                 onTap: () {
                   showAddTaskDialog(context);
-                  // _onItemTapped(0); // optional, to switch to list tab
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -67,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Icon(
                       Icons.add_circle_outline,
-                      size: 35,
+                      size: 50,
                       color: _selectedIndex == 1 ? primaryColor : Colors.grey,
                     ),
                   ],
@@ -93,26 +142,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _pages[_selectedIndex],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                await auth.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => Signin()),
-                );
-              },
-              child: Text("SIGN OUT"),
-            ),
-          ),
-        ],
-      ),
+      body: _pages[_selectedIndex],
     );
   }
 }
