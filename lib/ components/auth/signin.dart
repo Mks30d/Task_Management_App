@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tmaa/%20components/auth/signup.dart';
+import 'package:tmaa/%20components/home/home_ui/home_page.dart';
 import 'package:tmaa/main.dart';
 
 class Signin extends StatefulWidget {
@@ -27,12 +28,7 @@ class _SigninState extends State<Signin> {
       print("user:--- ${userCredential.user}");
       print("email:--- ${userCredential.user!.email}");
       print("uid:--- ${userCredential.user!.uid}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Successful..."),
-          backgroundColor: Colors.green,
-        ),
-      );
+
       return true;
     } catch (e) {
       print("error:--- $e");
@@ -105,6 +101,11 @@ class _SigninState extends State<Signin> {
                   if (_formKey.currentState!.validate()) {
                     // return true if email/password is entered else false
                     if (await loginUserWithEmailAndPassword()) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          ));
                       _formKey.currentState!
                           .reset(); // to reset form field state
                     }
@@ -150,94 +151,6 @@ class _SigninState extends State<Signin> {
             ],
           ),
         ),
-
-        // child: Column(
-        //   children: [
-        //     Form(
-        //       key: _formKey,  // GlobalKey
-        //       child: Column(
-        //         mainAxisAlignment: MainAxisAlignment.center,
-        //         crossAxisAlignment: CrossAxisAlignment.center,
-        //         children: [
-        //           const Text(
-        //             'Sign In',
-        //             style: TextStyle(
-        //               fontSize: 30,
-        //               fontWeight: FontWeight.bold,
-        //             ),
-        //           ),
-        //           const SizedBox(height: 15),
-        //           TextFormField(
-        //             controller: emailController,
-        //             decoration: const InputDecoration(
-        //               hintText: 'Email',
-        //             ),
-        //             validator: (value) { // for showing error when email is not entered
-        //               if (value!.isEmpty) {
-        //                 return "Enter email...";
-        //               }
-        //               return null;
-        //             },
-        //           ),
-        //           const SizedBox(height: 15),
-        //           TextFormField(
-        //             controller: passwordController,
-        //             decoration: const InputDecoration(
-        //               hintText: 'Password',
-        //             ),
-        //             obscureText: true,
-        //             validator: (value) { // for showing error when password is not entered
-        //               if (value!.isEmpty) {
-        //                 return "Enter password...";
-        //               }
-        //               return null;
-        //             },
-        //           ),
-        //           const SizedBox(height: 20),
-        //           ElevatedButton(
-        //             onPressed: () async {
-        //               if (_formKey.currentState!.validate()) { // return true if email/password is entered else false
-        //                 if (await loginUserWithEmailAndPassword()) {
-        //                   _formKey.currentState!.reset(); // to reset form field state
-        //                 }
-        //               }
-        //               print("emailController: ${emailController.text}");
-        //               print("passwordController: ${passwordController.text}");
-        //             },
-        //             child: const Text(
-        //               'SIGN IN',
-        //             ),
-        //           ),
-        //           const SizedBox(height: 20),
-        //           InkWell(
-        //             onTap: () {
-        //               Navigator.push(
-        //                   context,
-        //                   MaterialPageRoute(
-        //                     builder: (context) => SignupPage(),
-        //                   ));
-        //             },
-        //             child: RichText(
-        //               text: TextSpan(
-        //                 text: 'Don\'t have an account? ',
-        //                 style: Theme.of(context).textTheme.titleMedium,
-        //                 // style: TextStyle(color: Colors.black54),
-        //                 children: [
-        //                   TextSpan(
-        //                       text: 'Sign Up',
-        //                       // style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        //                       //       fontWeight: FontWeight.bold,
-        //                       //     ),
-        //                       style: TextStyle(fontWeight: FontWeight.bold)),
-        //                 ],
-        //               ),
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //     ),
-        //   ],
-        // ),
       ),
     );
   }

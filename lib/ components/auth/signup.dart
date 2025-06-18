@@ -99,8 +99,13 @@ class _SignupState extends State<Signup> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  if (_formKey.currentState!.validate()) { // return true if email/password is entered else falseAdd commentMore actions
+                  if (_formKey.currentState!.validate()) { // return true if email/password is entered else false
                     if (await createUserWithEmailAndPassword()) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Signin(),
+                          ));
                       _formKey.currentState!.reset(); // to reset form field state
                     }
                   }
